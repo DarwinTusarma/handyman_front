@@ -1,39 +1,52 @@
 <section class="container-fluid">
     <h3 class="text-center">Registrar servicio</h3>
-    <form>
-      <p class = "col-12">
-          <label>Tipo de documento del técnico</label>
-          <select class="form-select">
-              <option value="1">CC</option>
-              <option value="2">CE</option>
-          </select>
-      </p>
+    <form [formGroup]="form" (ngSubmit)="onSubmitForm()">
+        <div class="col-12 my-2">
+            <label class="form-label">Tipo de documento del técnico</label>
+            <select class="form-select" formControlName="tehnicianDocumentType">
+                <option value="CC">CC</option>
+                <option value="CE">CE</option>
+            </select>
+            <div class="invalid-feedback">
+                Tipo de documento del técncio requerido
+            </div>
+        </div>
 
-      <p class = "col-12">
-          <label>Número de documento del técnico</label>
-      <input class="form-control" type="text" placeholder="Ingrese el ID del técnico" size="20" required>
-      </p>
+        <div class="col-12 my-2">
+            <label class="form-label">Número de documento del técnico</label>
+            <input class="form-control" type="text" formControlName="tehnicianDocumentNumber" placeholder="Ingrese el ID del técnico" size="20" required>
+            <div class="invalid-feedback">
+                Número de documento del técnico requerido
+            </div>
+        </div>
 
-      <p class = "col-12">
-      <label for="Servicio">Seleccione el tipo de servicio</label>
-      <select class="form-select" name="Tipo de servicio" id="Servicio" required>
-          <option value = "1">Instalación</option>
-          <option value = "2">Reparación</option>
-      </select>
-      </p>
+        <div class="col-12 my-2">
+            <label class="form-label">Número del servicio</label>
+            <input class="form-control" type="text" formControlName="idService" placeholder="Ingrese el número del servicio" size="20" required>
+            <div class="invalid-feedback">
+                Número del servicio requerido
+            </div>
+        </div>
 
-      <p class = "col-12">
-          <label>Fecha de inicio</label>
-          <input class="form-control" type="datetime-local" id="datetime-local" name="trip-start" required>
-      </p>
+        <div class="col-12 my-2">
+            <label class="form-label">Fecha de inicio</label>
+            <input class="form-control" type="datetime-local" formControlName="startDate" id="datetime-local" name="trip-start" required>
+            <div class="invalid-feedback">
+                Fecha de inicio requerida
+            </div>
+        </div>
 
-      <p class = "col-12">
-          <label>Fecha fin</label>
-          <input class="form-control" type="datetime-local" name="trip-end"required>
-      </p>
-      <p class = "col-12">
-          <input class="btn btn-primary" type="submit" value="Enviar formulario" required>
-      </p>
+        <div class="col-12 my-2">
+            <label class="form-label">Fecha fin</label>
+            <input class="form-control" type="datetime-local" formControlName="finalDate" name="trip-end" required>
+            <div class="invalid-feedback">
+                Fecha de fin requerida
+            </div>
+        </div>
 
-  </form>
+        <div class="col-12 my-2 pt-3">
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+    </form>
+    <code>{{form.value | json}}</code>
 </section>

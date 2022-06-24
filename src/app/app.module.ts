@@ -1,5 +1,9 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+
+import { NotifierModule } from 'angular-notifier';
 
 import { AppComponent } from './app.component';
 import { ServiceTechnicianFormComponent } from './service-technician/service-technician-form/service-technician-form.component';
@@ -18,7 +22,11 @@ import { MainServiceTechnicianComponent } from './service-technician/main-servic
     MainServiceTechnicianComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    FormsModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+    NotifierModule
   ],
   providers: [],
   bootstrap: [AppComponent]
