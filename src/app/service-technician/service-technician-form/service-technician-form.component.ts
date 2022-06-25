@@ -1,11 +1,13 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ServiceTechnicianModel } from '@app/shared/models/service-technician.model';
-import { ServiceTechnicianServiceService } from '@app/shared/services/service-technician-service/service-technician-service.service';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { ServiceValidator } from '@shared/validators/service.validator';
+import { TechnicianDocumentValidator } from '@shared/validators/technician-document.validator';
 import { NotifierService } from 'angular-notifier';
-import { TechnicianModel } from 'src/app/shared/models/technician.model';
-import { TechnicianService } from 'src/app/shared/services/technician-service/technician.service';
+import { TechnicianService } from '@shared/services/technician-service/technician.service';
+import { intervalDateTimeValidator, maxDateTimeLocalValidator, minDateTimeLocalValidator } from '@shared/validators/datetime-local.validator';
+import { formatDate } from '@angular/common';
+import { ServiceTechnicianModel } from '@shared/models/service-technician.model';
+import { ServiceTechnicianServiceService } from '@shared/services/service-technician-service/service-technician-service.service';
 
 @Component({
   selector: 'app-service-technician-form',
@@ -20,7 +22,9 @@ export class ServiceTechnicianFormComponent implements OnInit {
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly notifierService: NotifierService,
+    private readonly technicianDocumentValidator: TechnicianDocumentValidator, 
     private readonly technicianService: TechnicianService,
+    private readonly serviceValidator: ServiceValidator,
     private readonly serviceTechnicianService: ServiceTechnicianServiceService
   ) { }
 
@@ -28,79 +32,106 @@ export class ServiceTechnicianFormComponent implements OnInit {
     return this.formGroup;
   }
 
+  get technicianDocumentGroup(): FormGroup {
+    return this.form.get("technicianDocument") as FormGroup;
+  }
+
+  get hasInvalidTechnicianDocument(): boolean {
+    return this.technicianDocumentGroup.getError('notFoundDocument');
+  }
+
+  get technicianDocumentTypeControl(): FormControl {
+    return this.form.get('technicianDocument')?.get('type') as FormControl;
+  }
+  
+  get technicianDocumentNumberControl(): FormControl {
+    return this.form.get('technicianDocument')?.get('number') as FormControl;
+  }
+
+  get hasInvalidIdService(): boolean {
+    return this.form.get('idService')?.getError('notFoundService');
+  }
+
+  get minDate(): string {
+    let lastWeek = new Date();
+    lastWeek.setDate(lastWeek.getDate() - 7);
+    return formatDate(lastWeek, 'yyyy-MM-ddThh:mm', 'en-US');
+  }
+
+  get maxDate(): string {
+    return formatDate(Date.now(), 'yyyy-MM-ddThh:mm', 'en-US');
+  }
+
+  get hasInvalidIntervalDate(): boolean {
+    return this.form.getError('invalidIntervalDate');
+  }
+
   ngOnInit(): void {
     this.createFormGroup();
   }
 
+  hasError(form: FormGroup, control: string) {
+    return (form.get(control)?.invalid && (form.get(control)?.dirty || !form.get(control)?.untouched));
+  }
+
   private createFormGroup(): void {
+    const today = new Date();
+    let lastWeek = new Date();
+    lastWeek.setDate(today.getDate()-7);
+    
     this.formGroup = this.formBuilder.group({
-      idService: [null, Validators.required],
-      tehnicianDocumentType: ['CC', Validators.required],
-      tehnicianDocumentNumber: [null, Validators.required],
+      idService: [null, {validators: [Validators.required], asyncValidators: [this.serviceValidator.validate.bind(this.serviceValidator)], updateOn: 'blur' }],
+      technicianDocument: this.formBuilder.group({
+        type:  ['CC', Validators.required],
+        number: [null, Validators.required]
+      }, { asyncValidators: [this.technicianDocumentValidator], updateOn: 'blur' }),
       idTechnician: [null],
-      startDate: [null, Validators.required],
-      finalDate: [null, Validators.required],
-    });
+      startDate: [null, [Validators.required, minDateTimeLocalValidator(lastWeek)]],
+      finalDate: [null, [Validators.required, maxDateTimeLocalValidator(today)]],
+    }, { validators: intervalDateTimeValidator });
     
     this.formGroup.get('idTechnician')?.disable();
   }
 
-  validateTechnicianDocument() {
-    console.log("VALIDANDO");
-    
-    const { tehnicianDocumentType, tehnicianDocumentNumber } = this.form.value;
-    this.technicianService.queryByDocument(tehnicianDocumentType, tehnicianDocumentNumber).subscribe({
-      next: (technician: TechnicianModel) => {
-        console.log(technician);
-        this.idTechnician = technician.id;
-        console.log(this.idTechnician);
-      },
-      error: (err: HttpErrorResponse)=>{
-        console.log(err);
-        if(err.status<200 || err.status>299){
-          this.notifierService.notify('error', err.error.status);
-        }
-      }
-    });
+  private setIdTechnician(): void {
+    const { type, number } = this.form.value.technicianDocument;
+    const currentTechnician = this.technicianService.currentTechnicianValue;
+    if(currentTechnician && currentTechnician.documentType === type && currentTechnician.documentNumber === number) {
+      this.form.patchValue({
+        idTechnician: currentTechnician.id
+      });
+    }
   }
 
-  saveServiceTechnician() {
-    const serviceTechnician : ServiceTechnicianModel = {
-      idTechnician : this.idTechnician,
-      idService : this.form.get('idService')?.value,
-      startDate: this.form.get('startDate')?.value,
-      finalDate: this.form.get('finalDate')?.value
-    }
+  private saveServiceTechnician(serviceTechnician: ServiceTechnicianModel) {
     console.log(serviceTechnician);
     this.serviceTechnicianService.saveServiceTechnician(serviceTechnician).subscribe({
       next: (serviceTech : ServiceTechnicianModel) => {
-        console.log(serviceTech);
+        this.notifierService.notify('success', 'El registro ha sido creado exitosamente.');
       },
       error: (err)=>{
-        console.log(err);
+        this.notifierService.notify('error', 'El registro no pudo ser creado.');
       }
     });
   }
 
-  onSubmitForm() {
+  onSubmitForm(): void {
     console.log("SUBMIT FORM");
+    console.log(this.form);
     
     if(this.form.pending) {
       this.notifierService.notify('warning', 'Por favor espere a que se validen los datos ingresados.');
+    } else if(this.hasInvalidTechnicianDocument){
+      this.notifierService.notify('error', 'El documento del técnico ingresado no es válido.');
+    } else if(this.hasInvalidIdService){
+      this.notifierService.notify('error', 'El Identificador del servicio ingresado no es válido.');
+    } else if(this.hasInvalidIntervalDate){
+      this.notifierService.notify('error', 'La fecha de incio debe ser menor que la fecha final.');
     } else if(this.form.invalid) {
-      console.log(this.form);
-      
       this.notifierService.notify('error', 'Por favor llene todos los campos requeridos.');
     } else {
-      console.log("POR VALIDAR");
-      if(this.idTechnician > 0n){
-        this.saveServiceTechnician();
-      } else {
-        this.notifierService.notify('error', 'El documento del tecnico no coincide con la base de datos.');
-      }
-      
-      
-      
+      this.setIdTechnician();
+      this.saveServiceTechnician(this.form.getRawValue());
     }
 
   }
