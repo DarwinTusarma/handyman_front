@@ -4,6 +4,9 @@ import { ServiceValidator } from '@shared/validators/service.validator';
 import { TechnicianDocumentValidator } from '@shared/validators/technician-document.validator';
 import { NotifierService } from 'angular-notifier';
 import { TechnicianService } from '@shared/services/technician-service/technician.service';
+import { intervalDateTimeValidator, maxDateTimeLocalValidator, minDateTimeLocalValidator } from '@shared/validators/datetime-local.validator';
+import { formatDate } from '@angular/common';
+import { ServiceTechnicianModel } from '@app/shared/models/service-technician.model';
 
 @Component({
   selector: 'app-service-technician-form',
@@ -46,6 +49,20 @@ export class ServiceTechnicianFormComponent implements OnInit {
     return this.form.get('idService')?.getError('notFoundService');
   }
 
+  get minDate(): string {
+    let lastWeek = new Date();
+    lastWeek.setDate(lastWeek.getDate() - 7);
+    return formatDate(lastWeek, 'yyyy-MM-ddThh:mm', 'en-US');
+  }
+
+  get maxDate(): string {
+    return formatDate(Date.now(), 'yyyy-MM-ddThh:mm', 'en-US');
+  }
+
+  get hasInvalidIntervalDate(): boolean {
+    return this.form.getError('invalidIntervalDate');
+  }
+
   ngOnInit(): void {
     this.createFormGroup();
   }
@@ -55,6 +72,10 @@ export class ServiceTechnicianFormComponent implements OnInit {
   }
 
   private createFormGroup(): void {
+    const today = new Date();
+    let lastWeek = new Date();
+    lastWeek.setDate(today.getDate()-7);
+    
     this.formGroup = this.formBuilder.group({
       idService: [null, {validators: [Validators.required], asyncValidators: [this.serviceValidator.validate.bind(this.serviceValidator)], updateOn: 'blur' }],
       technicianDocument: this.formBuilder.group({
@@ -62,10 +83,9 @@ export class ServiceTechnicianFormComponent implements OnInit {
         number: [null, Validators.required]
       }, { asyncValidators: [this.technicianDocumentValidator], updateOn: 'blur' }),
       idTechnician: [null],
-      startDate: [null, Validators.required],
-      finalDate: [null, Validators.required],
-    }
-    );
+      startDate: [null, [Validators.required, minDateTimeLocalValidator(lastWeek)]],
+      finalDate: [null, [Validators.required, maxDateTimeLocalValidator(today)]],
+    }, { validators: intervalDateTimeValidator });
     
     this.formGroup.get('idTechnician')?.disable();
   }
@@ -80,6 +100,10 @@ export class ServiceTechnicianFormComponent implements OnInit {
     }
   }
 
+  private saveServiceTechnician(serviceTechnician: ServiceTechnicianModel) {
+    // Lógica del botón
+  }
+
   onSubmitForm(): void {
     console.log("SUBMIT FORM");
     console.log(this.form);
@@ -90,11 +114,13 @@ export class ServiceTechnicianFormComponent implements OnInit {
       this.notifierService.notify('error', 'El documento del técnico ingresado no es válido.');
     } else if(this.hasInvalidIdService){
       this.notifierService.notify('error', 'El Identificador del servicio ingresado no es válido.');
+    } else if(this.hasInvalidIntervalDate){
+      this.notifierService.notify('error', 'La fecha de incio debe ser menor que la fecha final.');
     } else if(this.form.invalid) {
       this.notifierService.notify('error', 'Por favor llene todos los campos requeridos.');
     } else {
       this.setIdTechnician();
-      
+      this.saveServiceTechnician(this.form.getRawValue());
     }
 
   }

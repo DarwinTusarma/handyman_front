@@ -11,7 +11,7 @@
                 <option value="CE">CE</option>
             </select>
             <div class="invalid-feedback">
-                Tipo de documento del técncio {{hasInvalidTechnicianDocument? 'inválido' : 'requerido'}}
+                Tipo de documento del técncio {{hasInvalidTechnicianDocument? 'no válido' : 'requerido'}}
             </div>
         </div>
 
@@ -26,7 +26,7 @@
                 size="20"
                 required>
             <div class="invalid-feedback">
-                Número de documento del técnico {{hasInvalidTechnicianDocument? 'inválido' : 'requerido'}}
+                Número de documento del técnico {{hasInvalidTechnicianDocument? 'no válido' : 'requerido'}}
             </div>
         </div>
 
@@ -41,7 +41,7 @@
                 size="20"
                 required>
             <div class="invalid-feedback">
-                Número del servicio {{hasInvalidIdService? 'inválido' : 'requerido'}}
+                Número del servicio {{hasInvalidIdService? 'no válido' : 'requerido'}}
             </div>
         </div>
 
@@ -49,22 +49,31 @@
             <label class="form-label">Fecha de inicio</label>
             <input 
                 class="form-control"
-                [class.is-invalid]="hasError(form, 'startDate')"
+                [class.is-invalid]="hasError(form, 'startDate') || hasInvalidIntervalDate"
                 type="datetime-local"
                 formControlName="startDate"
-                id="datetime-local"
-                name="trip-start"
+                [min]="minDate"
+                [max]="maxDate"
+                name="startDate"
                 required>
             <div class="invalid-feedback">
-                Fecha de inicio requerida
+                Fecha de inicio {{hasInvalidIntervalDate? 'no válida' : 'requerida'}}
             </div>
         </div>
 
         <div class="col-12 my-2">
             <label class="form-label">Fecha fin</label>
-            <input class="form-control" type="datetime-local" formControlName="finalDate" name="trip-end" required>
+            <input
+                class="form-control"
+                [class.is-invalid]="hasError(form, 'finalDate') || hasInvalidIntervalDate"
+                type="datetime-local"
+                [min]="minDate"
+                [max]="maxDate"
+                formControlName="finalDate"
+                name="finalDate"
+                required>
             <div class="invalid-feedback">
-                Fecha de fin requerida
+                Fecha de fin {{hasInvalidIntervalDate? 'no válida' : 'requerida'}}
             </div>
         </div>
 
