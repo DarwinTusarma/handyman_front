@@ -14,7 +14,7 @@
 
         <div class="col-12 my-2">
             <label class="form-label">Número de documento del técnico</label>
-            <input class="form-control" type="text" formControlName="tehnicianDocumentNumber" placeholder="Ingrese el ID del técnico" size="20" required>
+            <input class="form-control" type="text" formControlName="tehnicianDocumentNumber" placeholder="Ingrese el ID del técnico" size="20" required (blur)="validateTechnicianDocument()">
             <div class="invalid-feedback">
                 Número de documento del técnico requerido
             </div>
