@@ -1,36 +1,60 @@
 <section class="container-fluid">
     <h3 class="text-center">Registrar servicio</h3>
-    <form [formGroup]="form" (ngSubmit)="onSubmitForm()">
+    <form [formGroup]="form" (ngSubmit)="onSubmitForm()" class="needs-validation">
         <div class="col-12 my-2">
             <label class="form-label">Tipo de documento del técnico</label>
-            <select class="form-select" formControlName="tehnicianDocumentType">
+            <select
+                class="form-select"
+                [formControl]="technicianDocumentTypeControl"
+                [class.is-invalid]="hasError(form, 'technicianDocument') && hasError(technicianDocumentGroup,'type')">
                 <option value="CC">CC</option>
                 <option value="CE">CE</option>
             </select>
             <div class="invalid-feedback">
-                Tipo de documento del técncio requerido
+                Tipo de documento del técncio {{hasInvalidTechnicianDocument? 'inválido' : 'requerido'}}
             </div>
         </div>
 
         <div class="col-12 my-2">
             <label class="form-label">Número de documento del técnico</label>
-            <input class="form-control" type="text" formControlName="tehnicianDocumentNumber" placeholder="Ingrese el ID del técnico" size="20" required>
+            <input 
+                class="form-control"
+                [class.is-invalid]="hasError(form, 'technicianDocument')"
+                type="text"
+                [formControl]="technicianDocumentNumberControl"
+                placeholder="Ingrese el ID del técnico"
+                size="20"
+                required>
             <div class="invalid-feedback">
-                Número de documento del técnico requerido
+                Número de documento del técnico {{hasInvalidTechnicianDocument? 'inválido' : 'requerido'}}
             </div>
         </div>
 
         <div class="col-12 my-2">
             <label class="form-label">Número del servicio</label>
-            <input class="form-control" type="text" formControlName="idService" placeholder="Ingrese el número del servicio" size="20" required>
+            <input 
+                class="form-control"
+                [class.is-invalid]="hasError(form, 'idService')"
+                type="text"
+                formControlName="idService"
+                placeholder="Ingrese el número del servicio"
+                size="20"
+                required>
             <div class="invalid-feedback">
-                Número del servicio requerido
+                Número del servicio {{hasInvalidIdService? 'inválido' : 'requerido'}}
             </div>
         </div>
 
         <div class="col-12 my-2">
             <label class="form-label">Fecha de inicio</label>
-            <input class="form-control" type="datetime-local" formControlName="startDate" id="datetime-local" name="trip-start" required>
+            <input 
+                class="form-control"
+                [class.is-invalid]="hasError(form, 'startDate')"
+                type="datetime-local"
+                formControlName="startDate"
+                id="datetime-local"
+                name="trip-start"
+                required>
             <div class="invalid-feedback">
                 Fecha de inicio requerida
             </div>
@@ -48,5 +72,6 @@
             <button type="submit" class="btn btn-primary">Guardar</button>
         </div>
     </form>
-    <code>{{form.value | json}}</code>
+    <p>{{ form.status }}</p>
+    <code>{{form.getRawValue() | json}}</code>
 </section>
