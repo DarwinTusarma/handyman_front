@@ -6,7 +6,8 @@ import { NotifierService } from 'angular-notifier';
 import { TechnicianService } from '@shared/services/technician-service/technician.service';
 import { intervalDateTimeValidator, maxDateTimeLocalValidator, minDateTimeLocalValidator } from '@shared/validators/datetime-local.validator';
 import { formatDate } from '@angular/common';
-import { ServiceTechnicianModel } from '@app/shared/models/service-technician.model';
+import { ServiceTechnicianModel } from '@shared/models/service-technician.model';
+import { ServiceTechnicianServiceService } from '@shared/services/service-technician-service/service-technician-service.service';
 
 @Component({
   selector: 'app-service-technician-form',
@@ -16,13 +17,15 @@ import { ServiceTechnicianModel } from '@app/shared/models/service-technician.mo
 export class ServiceTechnicianFormComponent implements OnInit {
 
   private formGroup: FormGroup;
+  private idTechnician: bigint;
 
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly notifierService: NotifierService,
     private readonly technicianDocumentValidator: TechnicianDocumentValidator, 
     private readonly technicianService: TechnicianService,
-    private readonly serviceValidator: ServiceValidator
+    private readonly serviceValidator: ServiceValidator,
+    private readonly serviceTechnicianService: ServiceTechnicianServiceService
   ) { }
 
   get form(): FormGroup {
@@ -101,7 +104,15 @@ export class ServiceTechnicianFormComponent implements OnInit {
   }
 
   private saveServiceTechnician(serviceTechnician: ServiceTechnicianModel) {
-    // Lógica del botón
+    console.log(serviceTechnician);
+    this.serviceTechnicianService.saveServiceTechnician(serviceTechnician).subscribe({
+      next: (serviceTech : ServiceTechnicianModel) => {
+        this.notifierService.notify('success', 'El registro ha sido creado exitosamente.');
+      },
+      error: (err)=>{
+        this.notifierService.notify('error', 'El registro no pudo ser creado.');
+      }
+    });
   }
 
   onSubmitForm(): void {
