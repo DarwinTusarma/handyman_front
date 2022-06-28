@@ -7,7 +7,8 @@ import { TechnicianService } from '@shared/services/technician-service/technicia
 import { intervalDateTimeValidator, maxDateTimeLocalValidator, minDateTimeLocalValidator } from '@shared/validators/datetime-local.validator';
 import { formatDate } from '@angular/common';
 import { ServiceTechnicianModel } from '@shared/models/service-technician.model';
-import { ServiceTechnicianServiceService } from '@shared/services/service-technician-service/service-technician-service.service';
+import { ServiceTechnicianService } from '@app/shared/services/service-technician-service/service-technician.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-service-technician-form',
@@ -17,7 +18,7 @@ import { ServiceTechnicianServiceService } from '@shared/services/service-techni
 export class ServiceTechnicianFormComponent implements OnInit {
 
   private formGroup: FormGroup;
-  private idTechnician: bigint;
+  public errorMessage: string;
 
   constructor(
     private readonly formBuilder: FormBuilder,
@@ -25,7 +26,7 @@ export class ServiceTechnicianFormComponent implements OnInit {
     private readonly technicianDocumentValidator: TechnicianDocumentValidator, 
     private readonly technicianService: TechnicianService,
     private readonly serviceValidator: ServiceValidator,
-    private readonly serviceTechnicianService: ServiceTechnicianServiceService
+    private readonly serviceTechnicianService: ServiceTechnicianService
   ) { }
 
   get form(): FormGroup {
@@ -62,6 +63,14 @@ export class ServiceTechnicianFormComponent implements OnInit {
     return formatDate(Date.now(), 'yyyy-MM-ddThh:mm', 'en-US');
   }
 
+  get hasInvalidStartDate(): boolean {
+    return this.form.get('startDate')?.getError('invalidDate');
+  }
+
+  get hasInvalidFinalDate(): boolean {
+    return this.form.get('finaltDate')?.getError('invalidDate');
+  }
+
   get hasInvalidIntervalDate(): boolean {
     return this.form.getError('invalidIntervalDate');
   }
@@ -93,6 +102,19 @@ export class ServiceTechnicianFormComponent implements OnInit {
     this.formGroup.get('idTechnician')?.disable();
   }
 
+  private resetFormGroup(): void {
+    this.form.patchValue({
+      idService: null,
+      technicianDocument: {
+        type: 'CC',
+        number: null
+      },
+      idTechnician: null,
+      startDate: null,
+      finalDate: null
+    });
+  }
+
   private setIdTechnician(): void {
     const { type, number } = this.form.value.technicianDocument;
     const currentTechnician = this.technicianService.currentTechnicianValue;
@@ -104,21 +126,25 @@ export class ServiceTechnicianFormComponent implements OnInit {
   }
 
   private saveServiceTechnician(serviceTechnician: ServiceTechnicianModel) {
-    console.log(serviceTechnician);
+    this.errorMessage = '';
     this.serviceTechnicianService.saveServiceTechnician(serviceTechnician).subscribe({
       next: (serviceTech : ServiceTechnicianModel) => {
         this.notifierService.notify('success', 'El registro ha sido creado exitosamente.');
+        this.resetFormGroup();
       },
-      error: (err)=>{
-        this.notifierService.notify('error', 'El registro no pudo ser creado.');
+      error: (err: HttpErrorResponse)=>{
+        const { error } = err;
+        console.log(error);
+        this.notifierService.notify('error', 'Lo sentimos, el registro no pudo ser creado.');
+        // if(error.metaData?.error) this.errorMessage = error.metaData.error;
+        if(error.status) {
+          this.errorMessage = error.status;
+        }
       }
     });
   }
 
   onSubmitForm(): void {
-    console.log("SUBMIT FORM");
-    console.log(this.form);
-    
     if(this.form.pending) {
       this.notifierService.notify('warning', 'Por favor espere a que se validen los datos ingresados.');
     } else if(this.hasInvalidTechnicianDocument){
@@ -127,13 +153,16 @@ export class ServiceTechnicianFormComponent implements OnInit {
       this.notifierService.notify('error', 'El Identificador del servicio ingresado no es válido.');
     } else if(this.hasInvalidIntervalDate){
       this.notifierService.notify('error', 'La fecha de incio debe ser menor que la fecha final.');
+    } else if(this.hasInvalidStartDate){
+      this.notifierService.notify('error', 'Los servicios solo puede ser registrados desde 1 semana atrás.');
+    } else if(this.hasInvalidFinalDate){
+      this.notifierService.notify('error', 'Los servicios no pueden ser registrados con una fecha posterior a la actual.');
     } else if(this.form.invalid) {
       this.notifierService.notify('error', 'Por favor llene todos los campos requeridos.');
     } else {
       this.setIdTechnician();
       this.saveServiceTechnician(this.form.getRawValue());
     }
-
   }
 
 }

@@ -7,7 +7,7 @@ import { environment } from 'src/environments/environment';
 @Injectable({
   providedIn: 'root'
 })
-export class ServiceTechnicianServiceService {
+export class ServiceTechnicianService {
 
   private readonly url = `${environment.apiUrl}/service-technician`;
   constructor(private readonly http: HttpClient) { }
