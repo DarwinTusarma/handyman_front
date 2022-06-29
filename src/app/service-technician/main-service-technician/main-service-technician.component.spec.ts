@@ -1,3 +1,4 @@
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MainServiceTechnicianComponent } from './main-service-technician.component';
@@ -8,7 +9,8 @@ describe('MainServiceTechnicianComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ MainServiceTechnicianComponent ]
+      declarations: [ MainServiceTechnicianComponent ],
+      schemas: [NO_ERRORS_SCHEMA]
     })
     .compileComponents();
 

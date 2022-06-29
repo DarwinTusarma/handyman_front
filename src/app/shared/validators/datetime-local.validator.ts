@@ -2,6 +2,7 @@ import { AbstractControl, ValidationErrors, ValidatorFn } from "@angular/forms";
 
 export function minDateTimeLocalValidator(date: Date): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
+        if(!control.value) return null;
         const controlValue: Date = new Date(control.value);
         // console.log(controlValue.toISOString() + " < " + date.toISOString());
         const forbidden = controlValue.getTime() <= date.getTime();
@@ -11,6 +12,7 @@ export function minDateTimeLocalValidator(date: Date): ValidatorFn {
 
 export function maxDateTimeLocalValidator(date: Date): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
+        if(!control.value) return null;
         const controlValue: Date = new Date(control.value);
         // console.log(controlValue.toISOString() + " > " + date.toISOString());
         const forbidden = controlValue.getTime() >= date.getTime();

@@ -95,8 +95,8 @@ export class ServiceTechnicianFormComponent implements OnInit {
         number: [null, Validators.required]
       }, { asyncValidators: [this.technicianDocumentValidator], updateOn: 'blur' }),
       idTechnician: [null],
-      startDate: [null, [Validators.required, minDateTimeLocalValidator(lastWeek)]],
-      finalDate: [null, [Validators.required, maxDateTimeLocalValidator(today)]],
+      startDate: [null, [Validators.required, minDateTimeLocalValidator(lastWeek), maxDateTimeLocalValidator(today)]],
+      finalDate: [null, [Validators.required, minDateTimeLocalValidator(lastWeek), maxDateTimeLocalValidator(today)]],
     }, { validators: intervalDateTimeValidator });
     
     this.formGroup.get('idTechnician')?.disable();
@@ -113,9 +113,10 @@ export class ServiceTechnicianFormComponent implements OnInit {
       startDate: null,
       finalDate: null
     });
+    this.form.reset();
   }
 
-  private setIdTechnician(): void {
+  setIdTechnician(): void {
     const { type, number } = this.form.value.technicianDocument;
     const currentTechnician = this.technicianService.currentTechnicianValue;
     if(currentTechnician && currentTechnician.documentType === type && currentTechnician.documentNumber === number) {
@@ -125,7 +126,7 @@ export class ServiceTechnicianFormComponent implements OnInit {
     }
   }
 
-  private saveServiceTechnician(serviceTechnician: ServiceTechnicianModel) {
+  saveServiceTechnician(serviceTechnician: ServiceTechnicianModel) {
     this.errorMessage = '';
     this.serviceTechnicianService.saveServiceTechnician(serviceTechnician).subscribe({
       next: (serviceTech : ServiceTechnicianModel) => {
@@ -158,6 +159,7 @@ export class ServiceTechnicianFormComponent implements OnInit {
     } else if(this.hasInvalidFinalDate){
       this.notifierService.notify('error', 'Los servicios no pueden ser registrados con una fecha posterior a la actual.');
     } else if(this.form.invalid) {
+      this.form.markAllAsTouched();
       this.notifierService.notify('error', 'Por favor llene todos los campos requeridos.');
     } else {
       this.setIdTechnician();
