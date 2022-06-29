@@ -1,6 +1,6 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { ServiceTechnicianModel } from '@app/shared/models/service-technician.model';
+import { ServiceTechnicianModel } from '@shared/models/service-technician.model';
 import { environment } from '@env/environment';
 import { serviceTechnicianMock } from '@shared/mocks/service-technician.mock';
 

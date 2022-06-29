@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ServiceTechnicianModel } from '@app/shared/models/service-technician.model';
+import { ServiceTechnicianModel } from '@shared/models/service-technician.model';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 

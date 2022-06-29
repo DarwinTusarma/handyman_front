@@ -7,7 +7,7 @@ import { TechnicianService } from '@shared/services/technician-service/technicia
 import { intervalDateTimeValidator, maxDateTimeLocalValidator, minDateTimeLocalValidator } from '@shared/validators/datetime-local.validator';
 import { formatDate } from '@angular/common';
 import { ServiceTechnicianModel } from '@shared/models/service-technician.model';
-import { ServiceTechnicianService } from '@app/shared/services/service-technician-service/service-technician.service';
+import { ServiceTechnicianService } from '@shared/services/service-technician-service/service-technician.service';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
@@ -103,6 +103,7 @@ export class ServiceTechnicianFormComponent implements OnInit {
   }
 
   private resetFormGroup(): void {
+    this.form.reset();
     this.form.patchValue({
       idService: null,
       technicianDocument: {
@@ -113,7 +114,6 @@ export class ServiceTechnicianFormComponent implements OnInit {
       startDate: null,
       finalDate: null
     });
-    this.form.reset();
   }
 
   setIdTechnician(): void {
