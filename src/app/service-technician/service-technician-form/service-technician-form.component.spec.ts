@@ -1,15 +1,15 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { serviceTechnicianEmptyFormValueMock, serviceTechnicianValidFormValueMock } from '@app/shared/mocks/service-technician.mock';
-import { serviceMock } from '@app/shared/mocks/service.mock';
-import { NotifierServiceMock } from '@app/shared/mocks/services-mocks/notifier-service.mock';
-import { ServiceTechnicianServiceMock } from '@app/shared/mocks/services-mocks/service-technician-service.mock';
-import { ServicesServiceMock } from '@app/shared/mocks/services-mocks/services-service.mock';
-import { TechnicianServiceMock } from '@app/shared/mocks/services-mocks/technician-service.mock';
-import { technicianMock } from '@app/shared/mocks/technician.mock';
-import { ServiceTechnicianService } from '@app/shared/services/service-technician-service/service-technician.service';
-import { ServicesService } from '@app/shared/services/services-service/services.service';
-import { TechnicianService } from '@app/shared/services/technician-service/technician.service';
+import { serviceTechnicianEmptyFormValueMock, serviceTechnicianValidFormValueMock } from '@shared/mocks/service-technician.mock';
+import { serviceMock } from '@shared/mocks/service.mock';
+import { NotifierServiceMock } from '@shared/mocks/services-mocks/notifier-service.mock';
+import { ServiceTechnicianServiceMock } from '@shared/mocks/services-mocks/service-technician-service.mock';
+import { ServicesServiceMock } from '@shared/mocks/services-mocks/services-service.mock';
+import { TechnicianServiceMock } from '@shared/mocks/services-mocks/technician-service.mock';
+import { technicianMock } from '@shared/mocks/technician.mock';
+import { ServiceTechnicianService } from '@shared/services/service-technician-service/service-technician.service';
+import { ServicesService } from '@shared/services/services-service/services.service';
+import { TechnicianService } from '@shared/services/technician-service/technician.service';
 import { NotifierService } from 'angular-notifier';
 
 import { ServiceTechnicianFormComponent } from './service-technician-form.component';
