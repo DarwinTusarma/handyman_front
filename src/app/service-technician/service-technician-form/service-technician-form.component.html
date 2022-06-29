@@ -57,7 +57,7 @@
                 name="startDate"
                 required>
             <div class="invalid-feedback">
-                Fecha de inicio {{hasInvalidIntervalDate? 'no válida' : 'requerida'}}
+                Fecha de inicio {{hasInvalidStartDate || hasInvalidIntervalDate? 'no válida' : 'requerida'}}
             </div>
         </div>
 
@@ -73,12 +73,14 @@
                 name="finalDate"
                 required>
             <div class="invalid-feedback">
-                Fecha de fin {{hasInvalidIntervalDate? 'no válida' : 'requerida'}}
+                Fecha de fin {{hasInvalidFinalDate || hasInvalidIntervalDate? 'no válida' : 'requerida'}}
             </div>
         </div>
-
-        <div class="col-12 my-2 pt-3">
-            <button type="submit" class="btn btn-primary">Guardar</button>
+        <div class="alert alert-danger my-3" role="alert" *ngIf="errorMessage">
+            {{ errorMessage }}
+        </div>
+        <div class="col-12 my-3">
+            <button type="submit" class="btn btn-primary" [disabled]="form.pending">Guardar</button>
         </div>
     </form>
 </section>
